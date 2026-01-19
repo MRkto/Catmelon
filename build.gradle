@@ -1,0 +1,120 @@
+plugins {
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+}
+
+base {
+    version = "5.0.07"
+    archivesName = rootProject.name
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(8)
+}
+
+minecraft {
+    mappings channel: 'snapshot', version: '20171003-1.12'
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+        }
+
+        client {
+            property 'forge.enabledGameTestNamespaces', project.name
+        }
+
+        server {
+            args '--nogui'
+            property 'forge.enabledGameTestNamespaces', project.name
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = "https://maven.cleanroommc.com" }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
+
+    compileOnly files("run/mods/blockbuster-2.6.1-1.12.2-dev.jar")
+    compileOnly files("run/mods/metamorph-1.3.1-1.12.2-dev.jar")
+    compileOnly files("run/mods/mclib-2.4.2-1.12.2-dev.jar")
+}
+
+jar {
+    manifest {
+        attributes([
+            "Implementation-Title"    : project.name,
+            "Implementation-Version"  : project.version,
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+        ])
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+processResources {
+    inputs.properties([
+        "name": project.name,
+        "version": project.version,
+        "modid": rootProject.name
+    ])
+
+    filesMatching("mcmod.info") {
+        expand inputs.properties
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    doLast {
+        def targetDir = file("build/classes/java/main")
+        delete fileTree(targetDir) {
+            include '**/*'
+
+            exclude '**/*.class'
+        }
+
+        copy {
+            from "build/resources/main"
+            into targetDir
+        }
+    }
+}
+
+tasks.register('prepareAssets', Copy) {
+    group = 'build'
+
+    from 'build/resources/main'
+    into project.file('build/classes/java/main')
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+sourceSets.main.resources.srcDir 'src/main/resources'
+
+tasks.withType(Jar).all { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+
+/* Dev build */
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    archiveClassifier = "dev"
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = "sources"
+}
+
+artifacts {
+    archives deobfJar
+    archives sourcesJar
+}

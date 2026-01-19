@@ -1,0 +1,24 @@
+[{
+  "modid": "${modid}",
+  "name": "${name}",
+  "description": "Remake of chameleon for Laboratory Delta",
+  "version": "${version}",
+  "mcversion": "1.12.2",
+  "url": "",
+  "authorList": [
+    "MRkoteich, Magmaout"
+  ],
+  "credits": "uwu, meow, owo, prrr~~",
+  "logoFile": "",
+  "useDependencyInformation": true,
+  "requiredMods": [
+    "metamorph",
+    "blockbuster",
+    "mclib"
+  ],
+  "dependencies": [
+    "metamorph",
+    "blockbuster",
+    "mclib"
+  ]
+}]
