@@ -14,9 +14,10 @@ public class AnimationController<C> {
         animatorChain = new AnimatorChain<>(animators);
         this.type = type;
     }
+    //TODO rewrite how prevPartialTicks calculates
     public void update(C object) {
         animatorChain.update(object);
-        prevPartialTicks = 0f;
+        prevPartialTicks -= 1f;
     }
     public void animate(Pose pose, List<IAction> actionList, float partialTicks) {
         animatorChain.animate(pose, actionList, partialTicks, prevPartialTicks);
